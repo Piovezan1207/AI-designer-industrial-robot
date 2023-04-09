@@ -11,6 +11,9 @@ import os
 from dotenv import load_dotenv
 
 translator = Translator()
+                    #X   Y   Z
+referencePosition = [0 , 0 , 0] #Ponto de referencia para confecção do código
+# referencePosition = [160, -169, 444.29]
 
 Broker = os.getenv("BROKER_MQTT")           #Ip do broker no raspberry
 PortaBroker = int(os.getenv("PORT_MQTT"))        #Porta do broker
@@ -18,6 +21,8 @@ TopicoSubscribe = os.getenv("TOPIC_MQTT")   #Topíco que a central ficara inscri
 username = os.getenv("USERNAME_MQTT")       #Para brokers mqtt com autentiação, é necessário login e senhaz
 password = os.getenv("PASSWORD_MQTT")
 KeepAliveBroker = 60       
+
+robot_ip = os.getenv("ROBOT_IP")            #IP do controlador do robô na rede em que o computador está conectado
 
 APIKEY = os.getenv("APIKEY_DALLE")          #API KEY para utilização do serviço de geração de imagens DALL-E 2 
 
@@ -45,9 +50,9 @@ def generateImage(prompt): #Função para requisição a API em cima da mensagem
         imgList = vetorizar.imageGetContour()          #Utiliza detecção de bordas para formas o vetor da imagem a ser desenhada
         # vetorizar.resultImageShow()                #Mostra o previwe da imagem (apenas para visulização)
         
-        draw = generateCode.generateCode([160, -169, 444.29],0,imgList) #Instancia classe que irá gerar código de desenho
+        draw = generateCode.generateCode(referencePosition,0,imgList) #Instancia classe que irá gerar código de desenho
         listComands = draw.generateCode()                               #Gera o código de desenho
-        sendToRobot.sendToRobot(listComands)                            #Envia códio para o robô
+        sendToRobot.sendToRobot(listComands, HOST=robot_ip)                            #Envia códio para o robô
 
 
     except:
